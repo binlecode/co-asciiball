@@ -1,0 +1,33 @@
+#!/bin/sh
+# Pre-commit hook: run ruff lint (--fix) then format on staged Python files.
+#
+# Enable it once per clone (the hooks dir is tracked, the config is local):
+#   git config core.hooksPath .githooks
+#
+# Uses the dev venv's ruff. Set that up with:
+#   uv venv .venv && uv pip install --python .venv pytest ruff
+#
+# tmp/ scratch scripts are gitignored, and ruff honors .gitignore, so only the
+# real source (src, tests, scripts) is checked here.
+set -eu
+
+ROOT="$(git rev-parse --show-toplevel)"
+RUFF="$ROOT/.venv/bin/ruff"
+if [ ! -x "$RUFF" ]; then
+  echo "pre-commit: ruff not found at $RUFF" >&2
+  echo "  set up the dev venv: uv venv .venv && uv pip install --python .venv pytest ruff" >&2
+  exit 1
+fi
+
+# Only staged Python files, and only those that still exist (skip deletions).
+STAGED_PY="$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$' || true)"
+if [ -z "$STAGED_PY" ]; then
+  exit 0
+fi
+
+# shellcheck disable=SC2086
+"$RUFF" check --fix $STAGED_PY
+# shellcheck disable=SC2086
+"$RUFF" format $STAGED_PY
+# shellcheck disable=SC2086
+git add $STAGED_PY
