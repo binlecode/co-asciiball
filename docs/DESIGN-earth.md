@@ -120,7 +120,7 @@ NEAR-SOLID bright text; different way of deciding where the windows fall. Text-f
 - `test_surface_material_model` (Earth part) — asserts the two-material structure:
   opacities `[0.0, 1.0]`, ocean is the window, land is opaque, no relief.
 - `test_earth_defaults_unchanged` — pins the shipped defaults (`fill 1.0 /
-  fill-falloff 0 / void-scale 2 / void-soft 0.6 / far-dim 0.85 / far-fill 0.5`) so
+  fill-falloff 0 / void-scale 2 / void-soft 0.6 / far-dim 1.0 / far-fill 0.85`) so
   they can't silently drift.
 - `test_reading_order_packing_is_lossless` — a window-class tile consumes no
   character (the stream splits, never chops); an all-land surface packs to the
