@@ -427,26 +427,28 @@ def split_sentences(text, min_len=12):
     """
     if not text or not text.strip():
         return []
-    raw = []
+    merged = []
     for para in re.split(r"\n\s*\n", text):  # blank line = hard boundary
+        raw = []
         for piece in _SENTENCE_SPLIT.split(para):
             kept = "".join(ch for ch in piece if ch.isprintable() or ch.isspace())
             cleaned = " ".join(kept.split())  # collapse internal whitespace runs
             if cleaned:
                 raw.append(cleaned)
-    merged, carry = [], ""
-    for s in raw:
-        s = (carry + " " + s) if carry else s
-        carry = ""
-        if len(s) < min_len:
-            carry = s  # too short -- fold into the NEXT sentence
-        else:
-            merged.append(s)
-    if carry:  # short trailing fragment folds back into the previous sentence
-        if merged:
-            merged[-1] = merged[-1] + " " + carry
-        else:
-            merged.append(carry)
+        para_merged, carry = [], ""
+        for s in raw:
+            s = (carry + " " + s) if carry else s
+            carry = ""
+            if len(s) < min_len:
+                carry = s  # too short -- fold into the NEXT sentence
+            else:
+                para_merged.append(s)
+        if carry:  # short trailing fragment stays within its paragraph
+            if para_merged:
+                para_merged[-1] = para_merged[-1] + " " + carry
+            else:
+                para_merged.append(carry)
+        merged.extend(para_merged)
     return merged
 
 

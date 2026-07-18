@@ -103,6 +103,11 @@ def test_split_sentences_blank_line_is_a_boundary():
     ]
 
 
+def test_split_sentences_does_not_merge_short_fragment_across_blank_line():
+    out = split_sentences("Hi.\n\nThis is a sufficiently long sentence to keep.")
+    assert out == ["Hi.", "This is a sufficiently long sentence to keep."]
+
+
 def test_split_sentences_keeps_abbreviation_with_following_word():
     # "e.g." splits off but is under min_len, so the merge rejoins it -- the
     # abbreviation stays with its word "in the common case" (a display heuristic).
